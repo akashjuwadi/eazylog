@@ -20,18 +20,6 @@ Open http://localhost:3000. The app renders inside a fixed-width phone shell (it
 - `/calendar` — Month grid with crown / logged / partial / missed day states, streak stats
 - `/day-complete` — End-of-day celebration (the `day_completed` event from the PRD)
 
-## Design notes
-
-- **Palette**: near-black charcoal (`#14161B`) surface with a warm gold accent (`#E8B23D`) tied to the crown/achievement motif, a cool blue for protein, green for fiber/success, and a muted red reserved for "missed" states — not a decoration, a status language.
-- **Type**: Space Grotesk for numerals and headlines (tabular figures for calorie/macro counts that need to feel stable as they update), Inter for UI text.
-- **Layout**: mobile app shell throughout, flat cards with hairline borders rather than heavy shadows, one pill-shaped accent (the floating "+" log button) as the single bold gesture per screen.
-
-## What's stubbed / not functional yet
-
-- Photo capture, voice recording, and AI parsing are static mock states (tap through them)
-- Search returns one hardcoded result for any query
-- No auth, persistence, or real calorie/macro calculation logic
-- No backend — everything reads from `lib/mock-data.ts`
 
 ## Structure
 
