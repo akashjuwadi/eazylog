@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background: #0B0C0F;
+  color: #F1EFE9;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phone shell — the whole product lives on a fixed-width mobile canvas,
+   centered on a dark studio backdrop when viewed wide (desktop preview). */
+.app-shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: #14161B;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 431px) {
+  .app-shell {
+    min-height: 100vh;
+    max-height: 932px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    border-radius: 36px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px #23262E;
+  }
+}
+
+.hairline {
+  border-color: #2B2E36;
+}
+
+.scroll-region {
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scroll-region::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #E8B23D;
+  outline-offset: 2px;
+}
