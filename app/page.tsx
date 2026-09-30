@@ -4,11 +4,11 @@ import Link from "next/link";
 import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { ProgressBar } from "@/components/ProgressBar";
-import { today, streak, savedMeals } from "@/lib/mock-data";
+import { streak, savedMeals } from "@/lib/mock-data";
 import { useLog, MEAL_ORDER, MEAL_LABELS, currentMealSlot } from "@/lib/store";
 
 export default function HomePage() {
-  const { entries, addEntry } = useLog();
+  const { entries, profile, addEntry } = useLog();\n  const targets = profile.targets;
 
   const totals = entries.reduce(
     (acc, e) => {
@@ -22,9 +22,9 @@ export default function HomePage() {
     { cal: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
   );
 
-  const remaining = today.calories.target - totals.cal;
-  const proteinLeft = Math.max(0, today.protein.target - totals.protein);
-  const fiberLeft = Math.max(0, today.fiber.target - totals.fiber);
+  const remaining = targets.calories.target - totals.cal;
+  const proteinLeft = Math.max(0, targets.protein.target - totals.protein);
+  const fiberLeft = Math.max(0, targets.fiber.target - totals.fiber);
 
   const frequentSuggestion = savedMeals[0];
 
@@ -61,11 +61,11 @@ export default function HomePage() {
                 {totals.cal.toLocaleString()}
               </span>
               <span className="text-[15px] text-faint">
-                / {today.calories.target.toLocaleString()} kcal
+                / {targets.calories.target.toLocaleString()} kcal
               </span>
             </div>
           </div>
-          <ProgressBar value={totals.cal} target={today.calories.target} color="bg-gold" height="h-2.5" />
+          <ProgressBar value={totals.cal} target={targets.calories.target} color="bg-gold" height="h-2.5" />
           <p className="text-[13px] text-dim mt-2">
             {remaining >= 0
               ? `${remaining.toLocaleString()} calories remaining`
@@ -75,12 +75,12 @@ export default function HomePage() {
 
         {/* Macro rows */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <MacroTile label="Protein" value={totals.protein} target={today.protein.target} unit="g" left={proteinLeft} color="bg-blue" />
-          <MacroTile label="Fiber" value={totals.fiber} target={today.fiber.target} unit="g" left={fiberLeft} color="bg-green" />
+          <MacroTile label="Protein" value={totals.protein} target={targets.protein.target} unit="g" left={proteinLeft} color="bg-blue" />
+          <MacroTile label="Fiber" value={totals.fiber} target={targets.fiber.target} unit="g" left={fiberLeft} color="bg-green" />
         </div>
         <div className="grid grid-cols-2 gap-3 mb-7">
-          <MacroTileSmall label="Carbs" value={totals.carbs} target={today.carbs.target} />
-          <MacroTileSmall label="Fat" value={totals.fat} target={today.fat.target} />
+          <MacroTileSmall label="Carbs" value={totals.carbs} target={targets.carbs.target} />
+          <MacroTileSmall label="Fat" value={totals.fat} target={targets.fat.target} />
         </div>
 
         {/* Frequent combo nudge */}
