@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -8,7 +10,17 @@ import { streak, savedMeals } from "@/lib/mock-data";
 import { useLog, MEAL_ORDER, MEAL_LABELS, currentMealSlot } from "@/lib/store";
 
 export default function HomePage() {
-  const { entries, profile, addEntry } = useLog();\n  const targets = profile.targets;
+  const router = useRouter();
+  const { entries, profile, addEntry, hydrated } = useLog();
+
+  // First-time users start with onboarding (goal first), not an empty diary.
+  useEffect(() => {
+    if (hydrated && !profile.onboarded) router.replace("/onboarding");
+  }, [hydrated, profile.onboarded, router]);
+
+  if (!hydrated || !profile.onboarded) return null;
+
+  const targets = profile.targets;
 
   const totals = entries.reduce(
     (acc, e) => {
@@ -22,9 +34,9 @@ export default function HomePage() {
     { cal: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
   );
 
-  const remaining = targets.calories.target - totals.cal;
-  const proteinLeft = Math.max(0, targets.protein.target - totals.protein);
-  const fiberLeft = Math.max(0, targets.fiber.target - totals.fiber);
+  const remaining = targets.calories - totals.cal;
+  const proteinLeft = Math.max(0, targets.protein - totals.protein);
+  const fiberLeft = Math.max(0, targets.fiber - totals.fiber);
 
   const frequentSuggestion = savedMeals[0];
 
@@ -61,11 +73,11 @@ export default function HomePage() {
                 {totals.cal.toLocaleString()}
               </span>
               <span className="text-[15px] text-faint">
-                / {targets.calories.target.toLocaleString()} kcal
+                / {targets.calories.toLocaleString()} kcal
               </span>
             </div>
           </div>
-          <ProgressBar value={totals.cal} target={targets.calories.target} color="bg-gold" height="h-2.5" />
+          <ProgressBar value={totals.cal} target={targets.calories} color="bg-gold" height="h-2.5" />
           <p className="text-[13px] text-dim mt-2">
             {remaining >= 0
               ? `${remaining.toLocaleString()} calories remaining`
@@ -75,12 +87,12 @@ export default function HomePage() {
 
         {/* Macro rows */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <MacroTile label="Protein" value={totals.protein} target={targets.protein.target} unit="g" left={proteinLeft} color="bg-blue" />
-          <MacroTile label="Fiber" value={totals.fiber} target={targets.fiber.target} unit="g" left={fiberLeft} color="bg-green" />
+          <MacroTile label="Protein" value={totals.protein} target={targets.protein} unit="g" left={proteinLeft} color="bg-blue" />
+          <MacroTile label="Fiber" value={totals.fiber} target={targets.fiber} unit="g" left={fiberLeft} color="bg-green" />
         </div>
         <div className="grid grid-cols-2 gap-3 mb-7">
-          <MacroTileSmall label="Carbs" value={totals.carbs} target={targets.carbs.target} />
-          <MacroTileSmall label="Fat" value={totals.fat} target={targets.fat.target} />
+          <MacroTileSmall label="Carbs" value={totals.carbs} target={targets.carbs} />
+          <MacroTileSmall label="Fat" value={totals.fat} target={targets.fat} />
         </div>
 
         {/* Frequent combo nudge */}
@@ -144,7 +156,7 @@ export default function HomePage() {
           href="/day-complete"
           className="block text-center text-[14px] text-ink border hairline rounded-card py-3.5"
         >
-          Done eating for today? Finish today's log →
+          Done eating for today? Finish today&apos;s log →
         </Link>
       </div>
 

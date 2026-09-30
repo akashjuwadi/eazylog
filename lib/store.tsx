@@ -15,6 +15,12 @@ export type UserProfile = {
   bodyFatPct?: number;
   strengthDays: number;
   activity: ActivityLevel;
+  /** Goal details (only set for goals that need them). */
+  targetWeightKg?: number;
+  targetBodyFatPct?: number;
+  targetDate?: string; // YYYY-MM-DD
+  /** Estimated maintenance calories from onboarding. */
+  maintenanceCalories?: number;
   targets: { calories: number; protein: number; carbs: number; fat: number; fiber: number };
   onboarded: boolean;
 };
@@ -25,6 +31,13 @@ export const DEFAULT_PROFILE: UserProfile = {
   targets: { calories: 2000, protein: 150, carbs: 200, fat: 65, fiber: 35 },
   onboarded: false,
 };
+
+/** Fill in anything missing from an older/partial saved profile. */
+function mergeProfile(saved: unknown): UserProfile {
+  if (!saved || typeof saved !== "object") return DEFAULT_PROFILE;
+  const p = saved as Partial<UserProfile>;
+  return { ...DEFAULT_PROFILE, ...p, targets: { ...DEFAULT_PROFILE.targets, ...(p.targets ?? {}) } };
+}
 
 export type LogEntry = {
   id: string;
@@ -93,6 +106,8 @@ type LogContextType = {
   resetToSeed: () => void;
   profile: UserProfile;
   saveProfile: (profile: UserProfile) => void;
+  /** True once saved data has been read from localStorage. */
+  hydrated: boolean;
 };
 
 const LogContext = createContext<LogContextType | null>(null);
@@ -111,17 +126,24 @@ export function LogProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore malformed/missing storage
     }
+    try {
+      const rawProfile = window.localStorage.getItem(PROFILE_KEY);
+      if (rawProfile) setProfile(mergeProfile(JSON.parse(rawProfile)));
+    } catch {
+      // ignore malformed/missing storage
+    }
     setHydrated(true);
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));\n      window.localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      window.localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
     } catch {
       // storage may be unavailable (private mode, quota) — fail silently
     }
-  }, [entries, hydrated]);
+  }, [entries, profile, hydrated]);
 
   const addEntry: LogContextType["addEntry"] = (entry) => {
     const full: LogEntry = {
@@ -156,11 +178,12 @@ export function LogProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const resetToSeed = () => setEntries(seedEntries);\n  const saveProfile = (next: UserProfile) => setProfile(next);
+  const resetToSeed = () => setEntries(seedEntries);
+  const saveProfile = (next: UserProfile) => setProfile(next);
 
   return (
     <LogContext.Provider
-      value={{ entries, profile, addEntry, updateEntry, deleteEntry, duplicateEntry, resetToSeed, saveProfile }}
+      value={{ entries, profile, addEntry, updateEntry, deleteEntry, duplicateEntry, resetToSeed, saveProfile, hydrated }}
     >
       {children}
     </LogContext.Provider>
