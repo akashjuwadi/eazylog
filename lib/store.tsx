@@ -3,6 +3,28 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 export type MealSlot = "breakfast" | "lunch" | "dinner" | "snacks";
+export type Goal = "lose" | "fat" | "maintain" | "gain";
+export type ActivityLevel = "sedentary" | "light" | "active";
+
+export type UserProfile = {
+  goal: Goal;
+  sex: "female" | "male";
+  age: number;
+  heightCm: number;
+  weightKg: number;
+  bodyFatPct?: number;
+  strengthDays: number;
+  activity: ActivityLevel;
+  targets: { calories: number; protein: number; carbs: number; fat: number; fiber: number };
+  onboarded: boolean;
+};
+
+export const DEFAULT_PROFILE: UserProfile = {
+  goal: "lose", sex: "male", age: 29, heightCm: 170, weightKg: 73.5,
+  strengthDays: 4, activity: "sedentary",
+  targets: { calories: 2000, protein: 150, carbs: 200, fat: 65, fiber: 35 },
+  onboarded: false,
+};
 
 export type LogEntry = {
   id: string;
@@ -20,6 +42,7 @@ export type LogEntry = {
 };
 
 const STORAGE_KEY = "eazylog:entries:v1";
+const PROFILE_KEY = "eazylog:profile:v1";
 
 // Seed a couple of entries so the app doesn't look empty on first load —
 // equivalent to "today's log so far" in the PRD's home-screen example.
@@ -68,6 +91,8 @@ type LogContextType = {
   deleteEntry: (id: string) => void;
   duplicateEntry: (id: string) => void;
   resetToSeed: () => void;
+  profile: UserProfile;
+  saveProfile: (profile: UserProfile) => void;
 };
 
 const LogContext = createContext<LogContextType | null>(null);
@@ -76,6 +101,7 @@ export function LogProvider({ children }: { children: ReactNode }) {
   // Start from the same seed on server and client to avoid hydration
   // mismatches, then swap in anything saved locally after mount.
   const [entries, setEntries] = useState<LogEntry[]>(seedEntries);
+  const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -91,7 +117,7 @@ export function LogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));\n      window.localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
     } catch {
       // storage may be unavailable (private mode, quota) — fail silently
     }
@@ -130,11 +156,11 @@ export function LogProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const resetToSeed = () => setEntries(seedEntries);
+  const resetToSeed = () => setEntries(seedEntries);\n  const saveProfile = (next: UserProfile) => setProfile(next);
 
   return (
     <LogContext.Provider
-      value={{ entries, addEntry, updateEntry, deleteEntry, duplicateEntry, resetToSeed }}
+      value={{ entries, profile, addEntry, updateEntry, deleteEntry, duplicateEntry, resetToSeed, saveProfile }}
     >
       {children}
     </LogContext.Provider>
