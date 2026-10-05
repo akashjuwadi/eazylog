@@ -19,7 +19,7 @@ export default function HomePage() {
   }, [hydrated, profile.onboarded, router]);
 
   if (!hydrated || !profile.onboarded) return null;
-
+  
   const targets = profile.targets;
 
   const totals = entries.reduce(

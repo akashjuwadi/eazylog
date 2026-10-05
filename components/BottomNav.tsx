@@ -7,6 +7,7 @@ const tabs = [
   { href: "/", label: "Today", icon: HomeIcon },
   { href: "/history", label: "History", icon: HistoryIcon },
   { href: "/calendar", label: "Calendar", icon: CalendarIcon },
+  { href: "/friends", label: "Friends", icon: FriendsIcon },
 ];
 
 export function BottomNav() {
@@ -82,6 +83,17 @@ function CalendarIcon({ active }: { active: boolean }) {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <rect x="4" y="5.5" width="16" height="14.5" rx="2" stroke={active ? "#F1EFE9" : "#5E616B"} strokeWidth="1.8" />
       <path d="M4 10h16M8 3.5v3M16 3.5v3" stroke={active ? "#F1EFE9" : "#5E616B"} strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FriendsIcon({ active }: { active: boolean }) {
+  const c = active ? "#F1EFE9" : "#5E616B";
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="9" cy="8.5" r="3.2" stroke={c} strokeWidth="1.8" />
+      <path d="M3.5 19c.4-3 2.6-4.8 5.5-4.8s5.1 1.8 5.5 4.8" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M15.5 5.6a3 3 0 010 5.8M17.5 14.6c1.8.6 2.8 2.2 3 4.4" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

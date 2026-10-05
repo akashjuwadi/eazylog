@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { LogProvider } from "@/lib/store";
+import { AuthProvider } from "@/lib/auth";
+import { FriendsProvider } from "@/lib/friends";
+import { AuthGate } from "@/components/AuthGate";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,7 +32,13 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="bg-[#0B0C0F]">
         <div className="app-shell">
-          <LogProvider>{children}</LogProvider>
+          <AuthProvider>
+            <LogProvider>
+              <FriendsProvider>
+                <AuthGate>{children}</AuthGate>
+              </FriendsProvider>
+            </LogProvider>
+          </AuthProvider>
         </div>
       </body>
     </html>

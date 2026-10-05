@@ -69,3 +69,18 @@ body {
   outline: 2px solid #E8B23D;
   outline-offset: 2px;
 }
+
+/* Shared text inputs (login, friends). Matches the onboarding fields. */
+.field-input {
+  width: 100%;
+  background: #1D2027;
+  border: 1px solid #2B2E36;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #F1EFE9;
+  color-scheme: dark;
+}
+.field-input:focus {
+  border-color: #E8B23D;
+}
